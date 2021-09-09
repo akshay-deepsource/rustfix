@@ -71,19 +71,18 @@ fn compile_and_get_json_errors(file: &Path, mode: &str) -> Result<String, Error>
 fn compiles_without_errors(file: &Path, mode: &str) -> Result<(), Error> {
     let res = compile(file, mode)?;
 
-    match res.status.code() {
-        Some(0) => Ok(()),
-        _ => {
-            info!(
-                "file {:?} failed to compile:\n{}",
-                file,
-                String::from_utf8(res.stderr)?
-            );
-            Err(anyhow!(
-                "failed with status {:?} (`env RUST_LOG=parse_and_replace=info` for more info)",
-                res.status.code(),
-            ))
-        }
+    if let Some(0) = res.status.code() {
+        Ok(())
+    } else {
+        info!(
+            "file {:?} failed to compile:\n{}",
+            file,
+            String::from_utf8(res.stderr)?
+        );
+        Err(anyhow!(
+            "failed with status {:?} (`env RUST_LOG=parse_and_replace=info` for more info)",
+            res.status.code(),
+        ))
     }
 }
 
